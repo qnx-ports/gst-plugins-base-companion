@@ -1,0 +1,13 @@
+diff --git a/ext/alsa/gstalsaelement.c b/ext/alsa/gstalsaelement.c
+index 2bf4166..72567e7 100644
+--- a/ext/alsa/gstalsaelement.c
++++ b/ext/alsa/gstalsaelement.c
+@@ -37,7 +37,7 @@ G_GNUC_PRINTF (5, 6)
+ /* *INDENT-ON* */
+ static void
+ gst_alsa_error_wrapper (const char *file, int line, const char *function,
+-    int err, const char *fmt, ...)
++    unsigned int err, const char *fmt, ...)
+ {
+ #ifndef GST_DISABLE_GST_DEBUG
+   va_list args;

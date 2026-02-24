@@ -1,0 +1,92 @@
+# Alpine-Maintainer: Krassy Boykinov <kboykinov@teamcentrixx.com>
+# Maintainer: Felix Xing <fxing@qnx.com>
+
+pkgname=gst-plugins-base
+pkgver=1.26.8
+pkgrel=0
+pkgdesc="GStreamer streaming media framework base plug-ins"
+url="https://gstreamer.freedesktop.org"
+arch="all"
+license="GPL-2.0-or-later AND LGPL-2.0-or-later"
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-doc $pkgname-lang"
+depends="gstreamer
+        glib
+        qnx-egl
+        qnx-gles
+        libintl
+        orc
+        opus
+        libtheora
+        libvorbis
+        libpng
+        wayland
+        graphene
+        pango
+        libjpeg-turbo
+        qnx-alsa
+        "
+depends_dev="wayland-dev gstreamer-dev orc-dev"
+makedepends="
+    $depends_dev
+    iso-codes-dev
+    expat-dev
+    glib-dev
+    gobject-introspection-dev
+    graphene-dev
+    gtk3-dev
+    libogg-dev
+    libtheora-dev
+    libvorbis-dev
+    meson
+    opus-dev
+    orc-compiler
+    perl
+    qnx-alsa-dev
+    gles-headers
+    egl-headers
+    clang
+    libc++-dev
+    "
+source="https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-$pkgver.tar.xz
+        001-duplicated-symbols-in-libc.patch
+        002-fix-old-error-handler-signature.patch
+        003-remove-alsa-midi.patch
+        "
+ldpath="/usr/lib/gstreamer-1.0"
+
+options="!check"
+
+build() {
+    CC=clang \
+    CXX=clang++ \
+    CFLAGS="$CFLAGS -O2 -DNDEBUG" \
+    CXXFLAGS="$CXXFLAGS -O2 -DNDEBUG" \
+    CPPFLAGS="$CPPFLAGS -O2 -DNDEBUG -Wno-error=incompatible-function-pointer-types" \
+    abuild-meson \
+        -Db_lto=false \
+        -Dalsa=enabled \
+        -Dc_link_args="-Wl,-lsocket,-lm" \
+        -Dintrospection=enabled \
+        -Dpackage-origin="www.qnx.com" \
+        -Dpackage-name="GStreamer base plug-ins (QNX)" \
+        -Dtests="$(want_check && echo enabled || echo disabled)" \
+        . output
+    meson compile -C output
+}
+
+check() {
+    # most failures cause by XDG_RUNTIME_DIR missing
+    LD_LIBRARY_PATH="$builddir/output/gst-libs/gst/gl:$LD_LIBRARY_PATH"
+    meson test --print-errorlogs -C output || true
+}
+
+package() {
+    DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+32e7de419a457dbe110c93846bfaa424893901afb612cc97b92f478e601ade9700a01d92e02d4d86bca82b402ea954d90ace9634f5a3f1fecb9e5c5f92209aec  gst-plugins-base-1.26.8.tar.xz
+ad947ca281b77576d57241ee2d964be231cb24b5acb3f3642fbe4d08c438ac225a1525bc8d48a2d6f9b7c012c7f54ad3880cb9bfa23ad30dbdc0455697c539ed  001-duplicated-symbols-in-libc.patch
+58151e64f487b5d45cdd541ace33e47c0cf0b30ba7b889e6ac3b2ba5a1f5da41d7d3479c957cdac02dd266a99189d1fcb78f77f471fb356434137d59b54d6ccc  002-fix-old-error-handler-signature.patch
+c128abda49a9da6f14b90cb39d850f20c8f288718b0639b107e563960009a6ca3136f17ac8c9bc8ec624c278931d4df3d0eed52f564ffd66d75c74047d940b6b  003-remove-alsa-midi.patch
+"

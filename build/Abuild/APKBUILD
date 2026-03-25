@@ -3,7 +3,7 @@
 
 pkgname=gst-plugins-base
 pkgver=1.26.8
-pkgrel=${pkgrel:-0}
+pkgrel=0
 pkgdesc="GStreamer streaming media framework base plug-ins"
 url="https://gstreamer.freedesktop.org"
 arch="all"
@@ -84,7 +84,6 @@ package() {
     DESTDIR="$pkgdir" meson install --no-rebuild -C output
 }
 
-options="$options ${DISABLE_CHECK:+!check}"
 sha512sums="
 32e7de419a457dbe110c93846bfaa424893901afb612cc97b92f478e601ade9700a01d92e02d4d86bca82b402ea954d90ace9634f5a3f1fecb9e5c5f92209aec  gst-plugins-base-1.26.8.tar.xz
 ad947ca281b77576d57241ee2d964be231cb24b5acb3f3642fbe4d08c438ac225a1525bc8d48a2d6f9b7c012c7f54ad3880cb9bfa23ad30dbdc0455697c539ed  001-duplicated-symbols-in-libc.patch
